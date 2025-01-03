@@ -13,6 +13,16 @@ rank_list(
   orientation = c("vertical", "horizontal"),
   class = "default-sortable"
 )
+
+rank_list(
+  text = "",
+  labels,
+  input_id,
+  css_id = input_id,
+  options = sortable_options(),
+  orientation = c("vertical", "horizontal"),
+  class = "default-sortable"
+)
 }
 \arguments{
 \item{text}{Text to appear at top of list.}
@@ -48,8 +58,23 @@ You can embed a ranking question inside a \code{learnr} tutorial, using
 \code{\link[=question_rank]{question_rank()}}.
 
 To embed a \code{rank_list} inside a shiny app, see the Details section.
+
+Creates a ranking item list using the \code{SortableJS} framework,
+and generates an \code{htmlwidgets} element.  The elements of this list can be
+dragged and dropped in any order.
+
+You can embed a ranking question inside a \code{learnr} tutorial, using
+\code{\link[=question_rank]{question_rank()}}.
+
+To embed a \code{rank_list} inside a shiny app, see the Details section.
 }
 \details{
+You can embed a \code{rank_list} inside a Shiny app, to capture the preferred
+ranking order of your user.
+
+The widget automatically updates a Shiny output, with the matching
+\code{input_id}.
+
 You can embed a \code{rank_list} inside a Shiny app, to capture the preferred
 ranking order of your user.
 
@@ -96,7 +121,48 @@ if (interactive()) {
   shiny::runApp(app)
 }
 
+## - example-rank-list ------------------------------------------------
+
+if (interactive()) {
+  rank_list(
+    text = "You can drag, drop and re-order these items:",
+    labels = c("one", "two", "three", "four", "five"),
+    input_id = "example_2"
+  )
+}
+## - example-rank-list-multidrag ------------------------------------------
+
+if (interactive()) {
+  rank_list(
+    text = "You can select multiple items and drag as a group:",
+    labels = c("one", "two", "three", "four", "five"),
+    input_id = "example_2",
+    options = sortable_options(
+      multiDrag = TRUE
+    )
+  )
+}
+## - example-rank-list-swap -----------------------------------------------
+
+if (interactive()) {
+  rank_list(
+    text = "You can re-order these items, and notice the swapping behaviour:",
+    labels = c("one", "two", "three", "four", "five"),
+    input_id = "example_2",
+    options = sortable_options(
+      swap = TRUE
+    )
+  )
+}
+## Example of a shiny app
+if (interactive()) {
+  app <- system.file("shiny/rank_list/app.R", package = "sortable")
+  shiny::runApp(app)
+}
+
 }
 \seealso{
+\link{update_rank_list}, \link{sortable_js}, \link{bucket_list} and \link{question_rank}
+
 \link{update_rank_list}, \link{sortable_js}, \link{bucket_list} and \link{question_rank}
 }

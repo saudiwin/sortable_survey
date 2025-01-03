@@ -1,11 +1,14 @@
 Type: Package
-Package: sortable
-Title: Drag-and-Drop in 'shiny' Apps with 'SortableJS'
-Version: 0.5.0.9000
+Package: sortsurvey
+Title: Port of Sortable for Compatibility with Quarto
+Version: 0.1
 Authors@R: 
-    c(person(given = "Andrie",
+    c(person(given="Robert",
+    family="Kubinec",role="cre",
+    email="bobkubinec@gmail.com"),
+    person(given = "Andrie",
              family = "de Vries",
-             role = c("cre", "aut"),
+             role = c("aut"),
              email = "apdevries@gmail.com"),
       person(given = "Barret",
              family = "Schloerke",

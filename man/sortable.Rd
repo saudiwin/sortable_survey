@@ -2,9 +2,11 @@
 % Please edit documentation in R/sortable-package.R
 \docType{package}
 \name{sortable}
+\alias{sortsurvey}
+\alias{sortsurvey-package}
 \alias{sortable}
 \alias{sortable-package}
-\title{sortable: Drag-and-Drop in 'shiny' Apps with 'SortableJS'}
+\title{sortsurvey: Port of Sortable for Compatibility with Quarto}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
@@ -45,10 +47,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Andrie de Vries \email{apdevries@gmail.com}
+\strong{Maintainer}: Robert Kubinec \email{bobkubinec@gmail.com}
 
 Authors:
 \itemize{
+  \item Andrie de Vries \email{apdevries@gmail.com}
   \item Barret Schloerke \email{barret@rstudio.com}
   \item Kenton Russell \email{kent.russell@timelyportfolio.com} (Original author) [conceptor]
 }
