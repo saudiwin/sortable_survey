@@ -166,3 +166,149 @@ bucket_list <- function(
 
   as_bucket_list(z)
 }
+
+#' Create a bucket list for use with surveydown
+#'
+#' This is a clone of the [bucket_list()] question that is compatible
+#' with the [pkg:surveydown] Quarto Shiny interactive format.
+#' All options are the same as the standard [bucket_list()] question.
+#'
+#' @template options
+#'
+#' @param header Text that appears at the top of the bucket list.  (This is
+#'   encoded as an HTML `<p>` tag, so not strictly speaking a header.)  Note
+#'   that you must explicitly provide `header` argument, especially in the case
+#'   where you want the header to be empty - to do this use `header = NULL` or
+#'   `header = NA`.
+#'
+#' @param ... One or more specifications for a rank list, and must be defined by
+#'   [add_rank_list].
+#'
+#' @param class A css class applied to the bucket list and rank lists.  This can
+#'   be used to define custom styling.
+#'
+#' @param group_name Passed to `SortableJS` as the group name. Also the input
+#'   value set in Shiny. (`input[[group_name]]`). Items can be dragged between
+#'   bucket lists which share the same group name.
+#'
+#' @param group_put_max Not yet implemented
+#'
+#' @param orientation Either `horizontal` or `vertical`, and specifies the
+#'   layout of the components on the page.
+#'
+#' @param css_id This is the css id to use, and must be unique in your shiny
+#'   app. This defaults to the value of `group_id`, and will be appended to the
+#'   value "bucket-list-container", to ensure the CSS id is unique for the
+#'   container as well as the embedded rank lists.
+#'
+#' @param output_width The width of each Shiny widget. Necessary for use
+#'  [pkg:surveydown].
+#'
+#' @param output_height The height of each Shiny widget. Necessary for use
+#'  [pkg:surveydown].
+#'
+#' @return A list with class `bucket_list`
+#' @seealso [rank_list_survey], [update_rank_list]
+#' @export
+bucket_list_survey <- function(
+    header = NULL,
+    ...,
+    group_name,
+    css_id = group_name,
+    group_put_max = rep(Inf, length(labels)),
+    options = sortable_options(),
+    class = "default-sortable",
+    orientation = c("horizontal", "vertical"),
+    output_width="100%",
+    output_height="100%"
+) {
+
+  assert_that(is_header(header))
+  if (isTRUE(is.na(header))) header <- NULL
+
+  assert_that(is_sortable_options(options))
+  if (missing(group_name) || is.null(group_name)) {
+    group_name <- increment_bucket_group()
+  }
+
+  orientation <- match.arg(orientation)
+
+  class <- paste(class, collapse = " ")
+
+  # capture the dots
+  rlang::check_dots_unnamed()
+  dot_vals <- rlang::list2(...)
+
+  # Remove any NULL elements
+  dot_vals <- dot_vals[!vapply(dot_vals, is.null, FUN.VALUE = logical(1))]
+
+  # modify the dots by adding the group_name to the sortable options
+  dots <- lapply(seq_along(dot_vals), function(i) {
+    dot <- dot_vals[[i]]
+    assert_that(is_add_rank_list(dot))
+
+    if (is.null(dot$css_id)) {
+      dot$css_id <- increment_rank_list()
+    }
+    modifyList(
+      dot,
+      val = list(
+        options = sortable_options(group = group_name),
+        class = paste(class, paste0("column_", i))
+      )
+    )
+  })
+
+  css_ids <- vapply(dots, function(dot) dot$css_id, character(1))
+  input_ids <- vapply(dots, function(dot) dot$input_id, character(1))
+
+  set_bucket <- sortable_js_capture_bucket_input(group_name, input_ids, css_ids)
+  display_empty_class <- sortable_js_set_empty_class(css_ids)
+
+  dots <- lapply(dots, function(dot) {
+    dot$options$onLoad <- chain_js_events(set_bucket, dot$options$onLoad) # nolint
+    dot$options$onSort <- chain_js_events(set_bucket, dot$options$onSort) # nolint
+    dot$options$onMove <- chain_js_events(dot$options$onMove, display_empty_class) # nolint
+    dot
+  })
+
+  # add in output_width / output_height to dots
+
+  dots <- lapply(dots, function(dot) {
+
+    dot$output_width <- "50%"
+    dot$output_height <- "50%"
+
+    dot
+
+  })
+
+  # construct list rank_list objects
+  sortables <- lapply(dots, function(dot) do.call(rank_list_survey, dot))
+
+  title_tag <-
+    if (!is.null(header)) {
+      tags$p(class = "bucket-list-header", header)
+    } else {
+      NULL
+    }
+
+  z <- tagList(
+    tags$div(
+      class = paste("bucket-list-container", class),
+      id = as_bucket_list_id(css_id),
+      width = output_width,
+      height= output_height,
+      title_tag,
+      tags$div(
+        class = paste(class, "bucket-list",
+                      paste0("bucket-list-", orientation)
+        ),
+        sortables
+      )
+    ),
+    bucket_list_dependencies()
+  )
+
+  as_bucket_list(z)
+}
