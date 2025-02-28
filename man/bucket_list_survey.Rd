@@ -46,10 +46,10 @@ be used to define custom styling.}
 \item{orientation}{Either \code{horizontal} or \code{vertical}, and specifies the
 layout of the components on the page.}
 
-\item{output_width}{The width of the Shiny widget. Necessary for use
+\item{output_width}{The width of each Shiny widget. Necessary for use
 \link{pkg:surveydown}.}
 
-\item{output_height}{The height of the Shiny widget. Necessary for use
+\item{output_height}{The height of each Shiny widget. Necessary for use
 \link{pkg:surveydown}.}
 }
 \value{

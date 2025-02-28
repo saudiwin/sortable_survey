@@ -7,6 +7,7 @@
 rank_list_survey(
   text = "",
   labels,
+  number_list = TRUE,
   input_id,
   css_id = input_id,
   options = sortable_options(),
@@ -22,7 +23,10 @@ rank_list_survey(
 \item{labels}{A character vector with the text to display inside the widget.
 This can also be a list of html tag elements.  The text content of each
 label or label name will be used to set the shiny \code{input_id} value.
-To create an empty \code{rank_list}, use \code{labels = list()}.}
+To create an empty \code{rank_list}, use \code{labels = list()}.
+
+@param number_list Whether to pre-prend numbers to the list of objects
+to sort. Defaults to TRUE.}
 
 \item{input_id}{output variable to read the plot/image from.}
 

@@ -329,6 +329,9 @@ update_bucket_list <- function(css_id, header = NULL,
 #'   label or label name will be used to set the shiny `input_id` value.
 #'   To create an empty `rank_list`, use `labels = list()`.
 #'
+#'  @param number_list Whether to pre-prend numbers to the list of objects
+#' to sort. Defaults to TRUE.
+#'
 #' @param text Text to appear at top of list.
 #'
 #' @param css_id This is the css id to use, and must be unique in your shiny
@@ -358,6 +361,7 @@ update_bucket_list <- function(css_id, header = NULL,
 rank_list_survey <- function(
     text = "",
     labels,
+    number_list = TRUE,
     input_id,
     css_id = input_id,
     options = sortable_options(),
@@ -374,10 +378,34 @@ rank_list_survey <- function(
   assert_that(is_sortable_options(options))
   assert_that(is_input_id(input_id))
 
-  options$onSort <- chain_js_events( # nolint
-    options$onSort, # nolint
-    sortable_js_capture_input(input_id)
-  )
+  if(number_list) {
+
+    options$onSort <- chain_js_events(
+      options$onSort,
+      sortable_js_capture_input(input_id),
+      htmlwidgets::JS(sprintf("
+      function (event) {
+        var items = event.from.children;
+        for (var i = 0; i < items.length; i++) {
+          items[i].textContent = (i + 1) + '. ' + items[i].textContent.replace(/^\\d+\\.\\s*/, '');
+        }
+      }
+    "))
+    )
+
+    labels <- paste0(seq(1:length(labels)),". ",labels)
+
+  } else {
+
+    options$onSort <- chain_js_events( # nolint
+      options$onSort, # nolint
+      sortable_js_capture_input(input_id)
+    )
+
+  }
+
+
+
   options$onLoad <- chain_js_events( # nolint
     options$onLoad, # nolint
     sortable_js_capture_input(input_id),
